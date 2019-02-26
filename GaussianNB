@@ -1,0 +1,123 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+df = pd.read_csv("C:\\Users\\user\\Documents\\100 Days of ML Coding\\Project - Santander Customer Transaction Prediction\\train.csv", index_col='ID_code')
+
+trues = df.loc[df['target'] == 1]
+falses = df.loc[df['target'] != 1].sample(frac=1)[:len(trues)]
+data = pd.concat([trues, falses], ignore_index=True).sample(frac=1)
+data.head()
+
+# use Z-scores to check which standardized variable is far from 0
+from scipy import stats
+import numpy as np
+z = np.abs(stats.zscore(df))
+
+threshold = 3
+list=[]
+list.append(np.where(z > 3))
+list
+
+res_list = [x[0] for x in list]
+row_list=[]
+for num in res_list:
+    try:
+        for i in range(0,200000):
+            row_list.append(num[i])
+    except:
+        break
+#res_list1 = [x[0] for x in res_list]
+print('Number of rows to be deleted: '+str(len(row_list)))
+
+df_dropped=df.drop(df.index[row_list])
+df_dropped['target'].value_counts()
+
+trues1 = df_dropped.loc[df_dropped['target'] == 1]
+falses1 = df_dropped.loc[df_dropped['target'] != 1].sample(frac=1)[:len(trues)]
+data1 = pd.concat([trues1, falses1], ignore_index=True).sample(frac=1)
+data1.head()
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+
+y = data1['target']
+X = data1.drop('target', axis=1)
+
+scaler = StandardScaler()
+scaler.fit(X)
+X = scaler.transform(X)
+
+X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2)
+
+from sklearn.ensemble import AdaBoostClassifier, BaggingClassifier, ExtraTreesClassifier, GradientBoostingClassifier, RandomForestClassifier
+from sklearn.naive_bayes import BernoulliNB, GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
+from sklearn.linear_model import LogisticRegression
+
+models = []
+models.append(('BNB', BernoulliNB()))
+models.append(('GNB', GaussianNB()))
+
+DECISION_FUNCTIONS = {"Ridge", "SGD", "LSVC", "NuSVC", "SVC"}
+
+from sklearn.metrics import roc_auc_score, roc_curve
+%matplotlib inline
+
+best_model = None
+best_model_name = ""
+best_valid = 0
+for name, model in models:
+    model.fit(X_train, y_train)
+    if name in DECISION_FUNCTIONS:
+        proba = model.decision_function(X_valid)
+    else:
+        proba = model.predict_proba(X_valid)[:, 1]
+    score = roc_auc_score(y_valid, proba)
+    fpr, tpr, _  = roc_curve(y_valid, proba)
+    plt.figure()
+    plt.plot(fpr, tpr, color='darkorange', label=f"ROC curve (auc = {score})")
+    plt.plot([0, 1], [0, 1], color='navy', linestyle='--')
+    plt.title(f"{name} Results")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.legend(loc="lower right")
+    plt.show()
+    if score > best_valid:
+        best_valid = score
+        best_model = model
+        best_model_name = name
+
+print(f"Best model is {best_model_name}")
+
+# Best model is GNB
+
+test = pd.read_csv("C:\\Users\\user\\Documents\\100 Days of ML Coding\\Project - Santander Customer Transaction Prediction\\test.csv", index_col='ID_code')
+
+#submission = pd.read_csv(prefix + "sample_submission.csv", index_col='ID_code')
+
+test_X = scaler.transform(test)
+
+if best_model_name in DECISION_FUNCTIONS:
+    test['target'] = best_model.decision_function(test_X)
+else:
+    test['target'] = best_model.predict_proba(test_X)[:, 1]
+#    test['target'] = best_model.predict(test_X)
+
+test.head()
+
+test1=test[['target']]
+test1['ID_code'] = test1.index
+test1.head()
+test1.to_csv("C:\\Users\\user\\Documents\\100 Days of ML Coding\\Project - Santander Customer Transaction Prediction\\submission v3.csv", index= False)
+
+
+
+
+
+
+
+
+
