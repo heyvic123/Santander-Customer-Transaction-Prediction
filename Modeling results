@@ -1,0 +1,59 @@
+df = pd.read_csv("C:\\Users\\user\\Downloads\\train.csv", index_col='ID_code')
+trues = df.loc[df['target'] == 1]
+falses = df.loc[df['target'] != 1].sample(frac=1)[:len(trues)]
+data = pd.concat([trues, falses], ignore_index=True).sample(frac=1)
+
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+
+y = data['target']
+X = data.drop('target', axis=1)
+
+scaler = StandardScaler()
+scaler.fit(X)
+X = scaler.transform(X)
+X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+from sklearn.ensemble import AdaBoostClassifier, BaggingClassifier, ExtraTreesClassifier, GradientBoostingClassifier, RandomForestClassifier
+from sklearn.naive_bayes import BernoulliNB, GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
+from sklearn.linear_model import LogisticRegression
+from xgboost import XGBClassifier
+
+models = []
+models.append(('BNB', BernoulliNB()))
+models.append(('GNB', GaussianNB()))
+models.append(('Logistic Regression', LogisticRegression()))
+models.append(('XGB', XGBClassifier()))
+
+DECISION_FUNCTIONS = {"Ridge", "SGD", "LSVC", "NuSVC", "SVC"}
+
+from sklearn.metrics import roc_auc_score, roc_curve
+%matplotlib inline
+
+best_model = None
+best_model_name = ""
+best_valid = 0
+for name, model in models:
+    model.fit(X_train, y_train)
+    if name in DECISION_FUNCTIONS:
+        proba = model.decision_function(X_valid)
+    else:
+        proba = model.predict_proba(X_valid)[:, 1]
+    score = roc_auc_score(y_valid, proba)
+    fpr, tpr, _  = roc_curve(y_valid, proba)
+    plt.figure()
+    plt.plot(fpr, tpr, color='darkorange', label=f"ROC curve (auc = {score})")
+    plt.plot([0, 1], [0, 1], color='navy', linestyle='--')
+    plt.title(f"{name} Results")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.legend(loc="lower right")
+    plt.show()
+    if score > best_valid:
+        best_valid = score
+        best_model = model
+        best_model_name = name
+
+print(f"Best model is {best_model_name}")
