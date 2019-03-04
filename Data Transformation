@@ -1,0 +1,63 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as 
+
+/* First start with viewing the data */
+# create true false flags
+df = pd.read_csv("C:\\Users\\user\\Downloads\\train.csv", index_col='ID_code')
+df['false'] = df['target'].map({1: 0, 0: 1})
+df['true'] = df['target']
+# Select top variables with the highest correlation with target 
+df_corr=df.corr()
+df_corr['target'].sort_values(ascending=False)[:16]
+
+/* Output */
+target     1.000000	
+var_6      0.066731	
+var_110    0.064275	
+var_53     0.063399	
+var_26     0.062422	
+var_22     0.060558	
+var_99     0.058367	
+var_190    0.055973	
+var_2      0.055870	
+
+/* Bin the numerical continuous variables into deciles & Generate table of odds */
+def test(var):
+    df_test=df[['true','false',var]]
+    df_test['decile'] = pd.qcut(df_test[var], 10, labels=False)
+    df_test=df_test[['true','false','decile']]
+    df_test_a=df_test.groupby(['decile']).sum()
+    df_test_a["sum"] = df_test_a["true"]+df_test_a["false"]
+
+    df_test_a1 = df_test_a.loc[:,"true":"false"].div(df_test_a["sum"], axis=0)
+    df_test_a1['decile'] = df_test_a1.index
+    df_test_a1=df_test_a1.reset_index(drop=True)
+    return(df_test_a1)
+    
+test("var_26")
+/* output */
+decile	TRUE
+0	0.0885
+1	0.0867
+2	0.090645
+3	0.088004
+4	0.089446
+5	0.089254
+6	0.0944
+7	0.102445
+8	0.110706
+9	0.1648
+
+
+df = pd.read_csv("C:\\Users\\user\\Downloads\\train.csv", index_col='ID_code')
+trues = df.loc[df['target'] == 1]
+falses = df.loc[df['target'] != 1].sample(frac=1)[:len(trues)]
+data = pd.concat([trues, falses], ignore_index=True).sample(frac=1)
+
+/* Polynomial degree of 3 transformation */
+data['var_26_a'] = data['var_26']**3 + data['var_26']
+del data['var_26']
+data = data.rename(columns={'var_26_a': 'var_26'})
+
+
