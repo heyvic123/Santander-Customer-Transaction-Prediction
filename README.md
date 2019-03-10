@@ -26,4 +26,4 @@ Dataset given is a masked data, with 200 unknown numerical variables and total r
     Starting predicting...
     The rmse of prediction is: 0.3629216599181957
 
-    ##### AUC:  0.8946998836662459
+    #### AUC:  0.8946998836662459
