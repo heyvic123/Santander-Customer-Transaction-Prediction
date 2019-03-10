@@ -58,8 +58,12 @@ from sklearn.tree import DecisionTreeClassifier, ExtraTreeClassifier
 from sklearn.linear_model import LogisticRegression
 
 models = []
+models.append(('Gradient Boosting', GradientBoostingClassifier(n_estimators=100, random_state=42)))
+models.append(('Random Forest', RandomForestClassifier(n_estimators=1000,random_state=42)))
 models.append(('BNB', BernoulliNB()))
 models.append(('GNB', GaussianNB()))
+models.append(('Logistic Regression', LogisticRegression()))
+models.append(('XGB', XGBClassifier()))
 
 DECISION_FUNCTIONS = {"Ridge", "SGD", "LSVC", "NuSVC", "SVC"}
 
