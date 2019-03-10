@@ -14,7 +14,7 @@ Dataset given is a masked data, with 200 unknown numerical variables and total r
     ##### XGBClassifier 
 
 
-    Gaussian NB obtained the best result among the above models. AUC 0.887
+   ####  Gaussian NB obtained the best result among the above models. AUC 0.887
 
 
 2. Light GBM (The best result so far):
