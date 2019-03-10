@@ -118,7 +118,7 @@ test1.head()
 test1.to_csv("C:\\Users\\user\\Documents\\100 Days of ML Coding\\Project - Santander Customer Transaction Prediction\\submission v3.csv", index= False)
 
 
-
+# GNB Result the best among all the sklearn models. Resulted in 0.88 AUC
 
 
 
