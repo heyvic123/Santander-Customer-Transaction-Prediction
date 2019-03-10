@@ -6,24 +6,24 @@ Dataset given is a masked data, with 200 unknown numerical variables and total r
 
 1. Sklearn models
 
-##### Gradient Boosting 
-##### Random Forest 
-##### BernoulliNB 
-##### GaussianNB
-##### LogisticRegression
-##### XGBClassifier 
+    ##### Gradient Boosting 
+    ##### Random Forest 
+    ##### BernoulliNB 
+    ##### GaussianNB
+    ##### LogisticRegression
+    ##### XGBClassifier 
 
 
-Gaussian NB obtained the best result among the above models. AUC 0.887
+    Gaussian NB obtained the best result among the above models. AUC 0.887
 
 
 2. Light GBM (The best result so far):
 
-Result of the fitting
+    Result of the fitting
 
-Early stopping, best iteration is:
-[10153]	valid_0's l2: 0.131712	valid_0's auc: 0.8947
-Starting predicting...
-The rmse of prediction is: 0.3629216599181957
+    Early stopping, best iteration is:
+    [10153]	valid_0's l2: 0.131712	valid_0's auc: 0.8947
+    Starting predicting...
+    The rmse of prediction is: 0.3629216599181957
 
-##### AUC:  0.8946998836662459
+    ##### AUC:  0.8946998836662459
