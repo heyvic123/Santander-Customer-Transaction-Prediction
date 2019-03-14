@@ -1,0 +1,109 @@
+# Light GBM with different param grids
+
+df = pd.read_csv("C:\\Users\\user\\Downloads\\train.csv", index_col='ID_code')
+trues = df.loc[df['target'] == 1]
+falses = df.loc[df['target'] != 1].sample(frac=1)[:len(trues)]
+data = pd.concat([trues, falses], ignore_index=True).sample(frac=1)
+
+# interactions
+create_interaction(data,'var_6','var_157')
+create_interaction(data,'var_6','var_0')
+create_interaction(data,'var_110','var_133')
+create_interaction(data,'var_110','var_191')
+create_interaction(data,'var_26','var_48')
+create_interaction(data,'var_26','var_134')
+create_interaction(data,'var_190','var_171')
+create_interaction(data,'var_133','var_71')
+create_interaction(data,'var_133','var_110')
+create_interaction(data,'var_133','var_196')
+
+# Feature standardization
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
+
+y = data['target']
+X = data.drop('target', axis=1)
+
+scaler = MinMaxScaler()
+scaler.fit(X)
+X = scaler.transform(X)
+
+X_train, X_valid, y_train, y_valid = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+
+import lightgbm as lgb
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import roc_auc_score, roc_curve
+
+gbm = lgb.LGBMClassifier(learning_rate=0.05,
+                         n_estimators=50000,
+                         objective='binary',
+                         metric='auc',
+                         min_child_weight=1,
+                         colsample_bytree=0.1,
+                         subsample=0.5,  
+                         min_child_samples=1,
+                         reg_lambda=1,
+                         min_split_gain=0,
+                         num_leaves=2)
+
+gbm.fit(X_train, y_train,
+        eval_set=[(X_valid, y_valid)],
+        eval_metric='l2',
+        early_stopping_rounds=3000
+        )
+print('Starting predicting...')
+# predict
+#y_pred = gbm.predict(X_valid, num_iteration=gbm.best_iteration_)
+y_pred = gbm.predict_proba(X_valid, num_iteration=gbm.best_iteration_)
+
+proba_target1=[]
+from itertools import islice
+for item in y_pred:
+    #print(item[1])
+    proba_target1.append(item[1])
+#proba_target1
+
+# eval
+print('The rmse of prediction is:', mean_squared_error(y_valid, proba_target1) ** 0.5)
+# AUC
+print('AUC: ',roc_auc_score(y_valid, proba_target1))
+
+# Result of the fitting
+# Early stopping, best iteration is:
+# [5982]	valid_0's l2: 0.127459	valid_0's auc: 0.900184
+# Starting predicting...
+# The rmse of prediction is: 0.35701375549931996
+# AUC:  0.9001844143709659
+
+test = pd.read_csv("C:\\Users\\user\\Documents\\100 Days of ML Coding\\Project - Santander Customer Transaction Prediction\\test.csv", index_col='ID_code')
+# interactions
+create_interaction(test,'var_6','var_157')
+create_interaction(test,'var_6','var_0')
+create_interaction(test,'var_110','var_133')
+create_interaction(test,'var_110','var_191')
+create_interaction(test,'var_26','var_48')
+create_interaction(test,'var_26','var_134')
+create_interaction(test,'var_190','var_171')
+create_interaction(test,'var_133','var_71')
+create_interaction(test,'var_133','var_110')
+create_interaction(test,'var_133','var_196')
+
+scaler = MinMaxScaler()
+scaler.fit(test)
+test_X = scaler.transform(test)
+test_pred = gbm.predict_proba(test_X, num_iteration=10153)
+test_pred
+
+proba_target_t=[]
+from itertools import islice
+for item in test_pred:
+    print(item[1])
+    proba_target_t.append(item[1])
+proba_target_t
+
+test['target']=proba_target_t
+
+test1=test.reset_index()
+test1=test1[['ID_code','target']]
+test1.head()
+test1.to_csv("C:\\Users\\user\\Documents\\100 Days of ML Coding\\Project - Santander Customer Transaction Prediction\\submission v5.csv", index= False)
