@@ -4,6 +4,8 @@ This is a Kaggle competition to predict the probability of event of the target, 
 
 Dataset given is a masked data, with 200 unknown numerical variables and total records of 200K lines of records. The result of the event is imbalanced.
 
+#
+
 1. Sklearn models
 
     ##### Gradient Boosting 
@@ -16,7 +18,7 @@ Dataset given is a masked data, with 200 unknown numerical variables and total r
 
    ####  Gaussian NB obtained the best result among the above models. AUC 0.887
 
-
+#
 
 3. Light GBM with adjusted parameters and KFold estimator (The best result so far) 
 
@@ -40,10 +42,11 @@ Dataset given is a masked data, with 200 unknown numerical variables and total r
     CV 
     print("\n >> CV score: {:<8.5f}".format(roc_auc_score(target, oof)))
     
+#    
     #### Train AUC:  0.95072  ; Valid AUC: 0.89884
     ### Submission AUC: 0.900
     
-    
+#    
     
 2. Light GBM 
 
