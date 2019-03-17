@@ -1,0 +1,122 @@
+train_df = pd.read_csv("C:\\Users\\user\\Documents\\Project - Santander Customer Transaction Prediction\\train.csv", index_col='ID_code')
+test_df = pd.read_csv("C:\\Users\\user\\Documents\\Project - Santander Customer Transaction Prediction\\test.csv", index_col='ID_code')
+
+features = [c for c in train_df.columns if c not in ['ID_code', 'target']]
+target = train_df['target']
+
+from sklearn.model_selection import StratifiedKFold
+num_round = 1000000
+kfold = 10
+folds = StratifiedKFold(n_splits=kfold, shuffle=False, random_state=44000)
+oof = np.zeros(len(train_df))
+predictions = np.zeros(len(test_df))
+
+# Best estimators
+param = {
+        'bagging_freq': 5,
+        'bagging_fraction': 0.38,
+        'boost_from_average':'false',
+        'boost': 'gbdt',
+        'feature_fraction': 0.045,
+        'learning_rate': 0.01,
+        'max_depth': -1,  
+        'metric':'auc',
+        'min_data_in_leaf': 80,
+        'min_sum_hessian_in_leaf': 10.0,
+        'num_leaves': 13,
+        'num_threads': 8,
+        'tree_learner': 'serial',
+        'objective': 'binary', 
+        'verbosity': 1
+    }
+for fold_, (trn_idx, val_idx) in enumerate(folds.split(train_df.values, target.values)):
+    print("Fold {}".format(fold_))
+    trn_data = lgb.Dataset(train_df.iloc[trn_idx][features], label=target.iloc[trn_idx])
+    val_data = lgb.Dataset(train_df.iloc[val_idx][features], label=target.iloc[val_idx])
+    clf = lgb.train(param, trn_data, num_round, valid_sets = [trn_data, val_data], verbose_eval=1000, early_stopping_rounds = 3500)
+    oof[val_idx] = clf.predict(train_df.iloc[val_idx][features], num_iteration=clf.best_iteration)
+    predictions += clf.predict(test_df[features], num_iteration=clf.best_iteration) / folds.n_splits
+
+# Result
+
+Fold 0
+Training until validation scores don't improve for 3500 rounds.
+[1000]	training's auc: 0.902842	valid_1's auc: 0.882912
+[2000]	training's auc: 0.914146	valid_1's auc: 0.889968
+[3000]	training's auc: 0.921574	valid_1's auc: 0.893658
+[4000]	training's auc: 0.927235	valid_1's auc: 0.89577
+[5000]	training's auc: 0.932186	valid_1's auc: 0.896996
+[6000]	training's auc: 0.936508	valid_1's auc: 0.897739
+[7000]	training's auc: 0.940661	valid_1's auc: 0.898265
+[8000]	training's auc: 0.944496	valid_1's auc: 0.898594
+[9000]	training's auc: 0.948199	valid_1's auc: 0.898756
+[10000]	training's auc: 0.951737	valid_1's auc: 0.898735
+[11000]	training's auc: 0.955112	valid_1's auc: 0.898758
+[12000]	training's auc: 0.958267	valid_1's auc: 0.898746
+[13000]	training's auc: 0.961287	valid_1's auc: 0.898556
+Early stopping, best iteration is:
+[9699]	training's auc: 0.95072	valid_1's auc: 0.89884
+Fold 1
+Training until validation scores don't improve for 3500 rounds.
+[1000]	training's auc: 0.903311	valid_1's auc: 0.87997
+[2000]	training's auc: 0.914671	valid_1's auc: 0.887879
+[3000]	training's auc: 0.922171	valid_1's auc: 0.891791
+[4000]	training's auc: 0.927977	valid_1's auc: 0.89369
+[5000]	training's auc: 0.932811	valid_1's auc: 0.895005
+[6000]	training's auc: 0.937203	valid_1's auc: 0.895633
+[7000]	training's auc: 0.941251	valid_1's auc: 0.895879
+[8000]	training's auc: 0.945027	valid_1's auc: 0.896166
+[9000]	training's auc: 0.948616	valid_1's auc: 0.896302
+[10000]	training's auc: 0.95203	valid_1's auc: 0.896225
+[11000]	training's auc: 0.95538	valid_1's auc: 0.89621
+[12000]	training's auc: 0.9585	valid_1's auc: 0.896086
+Early stopping, best iteration is:
+[8865]	training's auc: 0.948158	valid_1's auc: 0.896344
+Fold 2
+Training until validation scores don't improve for 3500 rounds.
+[1000]	training's auc: 0.902391	valid_1's auc: 0.885217
+[2000]	training's auc: 0.91369	valid_1's auc: 0.893781
+[3000]	training's auc: 0.921348	valid_1's auc: 0.89737
+[4000]	training's auc: 0.927207	valid_1's auc: 0.899497
+[5000]	training's auc: 0.932114	valid_1's auc: 0.900648
+[6000]	training's auc: 0.936662	valid_1's auc: 0.900884
+[7000]	training's auc: 0.940769	valid_1's auc: 0.901157
+[8000]	training's auc: 0.944582	valid_1's auc: 0.901394
+[9000]	training's auc: 0.948201	valid_1's auc: 0.901545
+[10000]	training's auc: 0.951645	valid_1's auc: 0.901435
+[11000]	training's auc: 0.954937	valid_1's auc: 0.901307
+[12000]	training's auc: 0.958086	valid_1's auc: 0.901196
+Early stopping, best iteration is:
+[8881]	training's auc: 0.947751	valid_1's auc: 0.901579
+Fold 3
+Training until validation scores don't improve for 3500 rounds.
+[1000]	training's auc: 0.902297	valid_1's auc: 0.884627
+[2000]	training's auc: 0.913514	valid_1's auc: 0.892145
+[3000]	training's auc: 0.921198	valid_1's auc: 0.896379
+[4000]	training's auc: 0.926909	valid_1's auc: 0.89838
+[5000]	training's auc: 0.931972	valid_1's auc: 0.899718
+[6000]	training's auc: 0.936394	valid_1's auc: 0.900399
+[7000]	training's auc: 0.940515	valid_1's auc: 0.900578
+[8000]	training's auc: 0.944391	valid_1's auc: 0.900535
+[9000]	training's auc: 0.948072	valid_1's auc: 0.900486
+[10000]	training's auc: 0.951551	valid_1's auc: 0.900374
+Early stopping, best iteration is:
+[7308]	training's auc: 0.94172	valid_1's auc: 0.900664
+Fold 4
+Training until validation scores don't improve for 3500 rounds.
+[1000]	training's auc: 0.902348	valid_1's auc: 0.888999
+[2000]	training's auc: 0.913586	valid_1's auc: 0.895945
+[3000]	training's auc: 0.921009	valid_1's auc: 0.899464
+[4000]	training's auc: 0.926806	valid_1's auc: 0.901243
+[5000]	training's auc: 0.93184	valid_1's auc: 0.902425
+[6000]	training's auc: 0.936313	valid_1's auc: 0.903048
+[7000]	training's auc: 0.940413	valid_1's auc: 0.90327
+[8000]	training's auc: 0.944259	valid_1's auc: 0.90321
+[9000]	training's auc: 0.947888	valid_1's auc: 0.903194
+Early stopping, best iteration is:
+[6458]	training's auc: 0.938254	valid_1's auc: 0.903294
+
+print("\n >> CV score: {:<8.5f}".format(roc_auc_score(target, oof)))
+# >> CV score: 0.89988 
+
+# Summission AUC score 0.9
