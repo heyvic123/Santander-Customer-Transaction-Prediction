@@ -56,9 +56,9 @@ Dataset given is a masked data, with 200 unknown numerical variables and total r
     [10153]	valid_0's l2: 0.131712	valid_0's auc: 0.8947
     Starting predicting...
     The rmse of prediction is: 0.3629216599181957
-
+#
     #### train AUC:  0.8946998836662459
-
+#
 
 
 3. Light GBM added with 10 interaction terms 
@@ -69,5 +69,6 @@ Dataset given is a masked data, with 200 unknown numerical variables and total r
     [5982]	valid_0's l2: 0.127459	valid_0's auc: 0.900184
     Starting predicting...
     The rmse of prediction is: 0.35701375549931996
-    
+#    
     #### train AUC:  0.9001844143709659
+#
