@@ -13,7 +13,9 @@ Dataset given is a masked data, with 200 unknown numerical variables and total r
     ##### LogisticRegression
     ##### XGBClassifier 
 
+
    ####  Gaussian NB obtained the best result among the above models. AUC 0.887
+
 
 
 3. Light GBM with adjusted parameters and KFold estimator (The best result so far) 
@@ -42,6 +44,7 @@ Dataset given is a masked data, with 200 unknown numerical variables and total r
     ### Submission AUC: 0.900
     
     
+    
 2. Light GBM 
 
     Result of the fitting
@@ -52,6 +55,7 @@ Dataset given is a masked data, with 200 unknown numerical variables and total r
     The rmse of prediction is: 0.3629216599181957
 
     #### train AUC:  0.8946998836662459
+
 
 
 3. Light GBM added with 10 interaction terms 
