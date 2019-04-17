@@ -4,6 +4,9 @@ This is a Kaggle competition to predict if the customer would make a transaction
 
 Dataset given is a masked data, with 200 unknown numerical variables and total records of 200K lines of records. The result of the event is imbalanced.
 
+Data source:
+https://www.kaggle.com/c/santander-customer-transaction-prediction/data
+
 #
 
 1. Sklearn models
